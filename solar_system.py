@@ -14,6 +14,15 @@ YELLOWISH_WHITE = (255, 255, 246)
 BLUE = (0, 0, 255)
 RED = (188, 39, 50)
 
+NAME_TEXT_COLOR = (111, 236, 123)
+DIST_TEXT_COLOR = (56, 190, 255)
+SUN_NAME_COLOR = (144, 128, 254)
+SUN_TEXT_COLOR = (54, 32, 12)
+
+# Set up Fonts
+NAME_TEXT = pg.font.SysFont(name='TimesRoman', size=18, bold=True)
+DIST_TEXT = pg.font.SysFont(name='Sans', size=18, bold=True)
+
 
 # Class Solar System Bodies
 class SolarSystemBodies:
@@ -37,6 +46,9 @@ class SolarSystemBodies:
         self.y_vel = 0
         self.orbit = []
 
+        self.sun = False
+        self.distance_to_sun = 0
+
 
     # Method 1 - Draw the bodies on the Simulator
     def draw_body(self, WINDOW):
@@ -49,6 +61,27 @@ class SolarSystemBodies:
             center=(x, y),
             radius=self.radius
         )
+
+        if not self.sun:
+            name_text = NAME_TEXT.render(self.name, True, NAME_TEXT_COLOR)
+            WINDOW.blit(name_text, (x - 40, y - 55))
+
+            dist_text = DIST_TEXT.render(
+                f"Distance to Sun:{round(self.distance_to_sun/(3e8*60),3)} lt/min", True, DIST_TEXT_COLOR
+            )
+            WINDOW.blit(dist_text, (x - 40, y - 35))
+        else:
+            name_text = NAME_TEXT.render(self.name, True, SUN_NAME_COLOR)
+            WINDOW.blit(name_text, (x - 40, y - 75))
+
+            dist_text = DIST_TEXT.render(
+                f"{round(self.x/3e8, 3)}, {round(self.x/3e8, 3)} lt-sec",
+                True,
+                DIST_TEXT_COLOR
+            )
+            WINDOW.blit(dist_text, (x - 40, y - 55))
+
+
     # Method 2 - Calculate the Gravitational Force
     def gravitational_force(self, ss_body):
         # F = G M m / r^2
@@ -56,6 +89,8 @@ class SolarSystemBodies:
         y_diff = ss_body.y - self.y
 
         distance = math.sqrt(x_diff**2 + y_diff**2)
+        if ss_body.sun:
+            self.distance_to_sun = distance
 
         g_force = self.G * self.mass * ss_body.mass / distance**2
 
@@ -133,7 +168,7 @@ mercury = SolarSystemBodies(
 
 # Planetary Data
 sun = SolarSystemBodies("Sun", YELLOW, 0, 0, 1.989e30, 30)
-
+sun.sun = True
 mercury = SolarSystemBodies("Mercury", GRAY, 0.39*SolarSystemBodies.AU, 0, 0.33e24, 6)
 mercury.y_vel = -47.4e3
 
