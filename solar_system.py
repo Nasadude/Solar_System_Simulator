@@ -153,22 +153,45 @@ clock = pg.time.Clock()
 
 # Create Simulation
 run = True
-while run:
+paused = False
+run = True
 
+while run:
     clock.tick(FPS)
     WINDOW.fill(BLACK)
     draw_stars(stars_list)
 
+    # ----------------------------
+    # HANDLE INPUT
+    # ----------------------------
     for event in pg.event.get():
-        if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+        if event.type == pg.QUIT:
             run = False
 
-    ss_bodies = [sun, mercury,venus,earth,mars]
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_ESCAPE:
+                run = False
+            elif event.key == pg.K_SPACE:
+                # Toggle pause ONCE per key press
+                paused = not paused
 
+    # ----------------------------
+    # UPDATE POSITIONS ONLY IF NOT PAUSED
+    # ----------------------------
+    ss_bodies = [sun, mercury, venus, earth, mars]
+
+    if not paused:
+        for body in ss_bodies:
+            body.update_position(ss_bodies)
+
+    # ----------------------------
+    # ALWAYS DRAW
+    # ----------------------------
     for body in ss_bodies:
-        body.update_position(ss_bodies)
         body.draw_body(WINDOW)
+
     pg.display.update()
+
 
 # Quit the Pygame
 pg.quit()
