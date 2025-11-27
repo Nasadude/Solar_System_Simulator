@@ -28,7 +28,7 @@ DIST_TEXT = pg.font.SysFont(name='Sans', size=18, bold=True)
 class SolarSystemBodies:
 
     AU = 1.496e11
-    SCALE = 270 / AU
+    SCALE = 250 / AU
     G = 6.6743e-11
     TIME_STEP = 24*3600
 
@@ -125,6 +125,28 @@ class SolarSystemBodies:
 
         self.orbit.append((self.x, self.y))
 
+    # Method 4 - Track the Orbit
+    def track_orbit(self, WINDOW):
+        if len(self.orbit) > 1:
+            centered_points = []
+            for (x, y) in self.orbit:
+                x = x * self.SCALE + WIDTH // 2
+                y = y * self.SCALE + HEIGHT // 2
+                centered_points.append((x, y))
+
+            pg.draw.lines(
+                surface=WINDOW,
+                color=self.color,
+                closed=False,
+                points=centered_points,
+                width=2
+            )
+
+    # Method 5 - draw
+    def draw(self, WINDOW, track=True):
+        self.draw_body(WINDOW)
+        if track:
+            self.track_orbit(WINDOW)
 
 # Create pygame Window
 screen_info = pg.display.Info()
@@ -223,7 +245,8 @@ while run:
     # ALWAYS DRAW
     # ----------------------------
     for body in ss_bodies:
-        body.draw_body(WINDOW)
+        #body.draw_body(WINDOW)
+        body.draw(WINDOW, track=True)
 
     pg.display.update()
 
